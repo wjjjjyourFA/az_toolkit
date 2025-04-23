@@ -1,0 +1,4 @@
+svglib
+reportlab
+#python-pcl
+open3d
