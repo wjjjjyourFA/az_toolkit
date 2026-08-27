@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
-import os
 import datetime
+import os
 
 import cv2
+
+try:
+    # 作为包导入时
+    from .config import GLOBAL_CONFIG
+except ImportError:
+    # 作为独立脚本运行
+    from az_toolkit.config import GLOBAL_CONFIG
 
 
 def extract_rtsp_frame(rtsp_url, file_extension, output_dir, strip_prefix=False, interval=10, show=False):
@@ -42,7 +49,8 @@ def extract_rtsp_frame(rtsp_url, file_extension, output_dir, strip_prefix=False,
 
 if __name__ == "__main__":
     rtsp_url = 'rtsp://username:password@192.168.1.64:554/stream'
-    save_path =  r"./../../../modules/tools/camera_calibration/Z0_Data/samples/image"
+    data_path = GLOBAL_CONFIG["simple_path"] + r"/samples_common/image"
+    save_path = data_path + "_extracted"
 
     extract_rtsp_frame(
         rtsp_url=rtsp_url,

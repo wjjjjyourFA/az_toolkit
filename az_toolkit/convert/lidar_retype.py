@@ -1,7 +1,15 @@
 import os
+
 import numpy as np
 # import pcl
 import open3d as o3d
+
+try:
+    # 作为包导入时
+    from .config import GLOBAL_CONFIG
+except ImportError:
+    # 作为独立脚本运行
+    from az_toolkit.config import GLOBAL_CONFIG
 
 
 def bin2txt(bin_file, target):
@@ -63,16 +71,16 @@ def bin2pcd_raw(bin_file, target):
     num = len(points)
 
     head = ["# .PCD v.7 - Point Cloud Data file format",
-             "VERSION .7",
-             "FIELDS x y z intensity",
-             "SIZE 4 4 4 4",
-             "TYPE F F F F",
-             "COUNT 1 1 1 1",
-             "WIDTH " + str(num),
-             "HEIGHT 1",   # 有num个点的无序点云数据集
-             "VIEWPOINT 0 0 0 1 0 0 0",
-             "POINTS " + str(num),
-             "DATA ascii"]
+            "VERSION .7",
+            "FIELDS x y z intensity",
+            "SIZE 4 4 4 4",
+            "TYPE F F F F",
+            "COUNT 1 1 1 1",
+            "WIDTH " + str(num),
+            "HEIGHT 1",  # 有num个点的无序点云数据集
+            "VIEWPOINT 0 0 0 1 0 0 0",
+            "POINTS " + str(num),
+            "DATA ascii"]
 
     base_name = os.path.splitext(os.path.basename(bin_file))[0]
     tmp_file = os.path.join(target, base_name + ".txt")
@@ -83,12 +91,12 @@ def bin2pcd_raw(bin_file, target):
         s = head[i] + '\n'
         file.write(s)
     for j in range(len(lidar_raw)):
-        s = str(lidar_raw[j][0]) + " " + str(lidar_raw[j][1]) + " "+str(lidar_raw[j][2]) + " " + str(int(lidar_raw[j][3])) + '\n'
+        s = str(lidar_raw[j][0]) + " " + str(lidar_raw[j][1]) + " " + str(lidar_raw[j][2]) + " " + str(
+            int(lidar_raw[j][3])) + '\n'
         file.write(s)
     file.close()
 
     os.rename(tmp_file, out_file)
-
 
 
 class LidarConvert:
@@ -99,7 +107,9 @@ class LidarConvert:
     def convert_bin_to_txt(self, bin_file, txt_file):
         try:
             # 从 .bin 文件读取点云数据
-            points = np.fromfile(bin_file, dtype=np.float32).reshape(-1, 4)
+            points = np.fromfile(bin_file, dtype=np.int32).reshape(-1, 4)
+            # 过滤掉全 0 行
+            points = points[~np.all(points == 0, axis=1)]
             # 保存到 .txt 文件
             np.savetxt(txt_file, points, fmt='%s', delimiter=' ')
         except ValueError as e:
@@ -122,8 +132,8 @@ class LidarConvert:
 
 
 if __name__ == "__main__":
-    input_folder = r"./../../../modules/tools/camera_calibration/Z0_Data/samples/lidar"
-    output_folder = input_folder + "_extracted"
+    input_folder = GLOBAL_CONFIG["simple_path"] + r"/samples_common/lidar"
+    output_folder = input_folder + "_converted"
 
     lidar_convertor = LidarConvert(input_folder, output_folder)
     lidar_convertor.run()

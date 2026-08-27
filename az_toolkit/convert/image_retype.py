@@ -1,9 +1,15 @@
 import os
-import glob
-import cv2
 
+import cv2
 # for jfif 2 png
 from PIL import Image
+
+try:
+    # 作为包导入时
+    from .config import GLOBAL_CONFIG
+except ImportError:
+    # 作为独立脚本运行
+    from az_toolkit.config import GLOBAL_CONFIG
 
 
 def esp2png(source, target):
@@ -63,8 +69,8 @@ class ImageConvert:
 
 
 if __name__ == "__main__":
-    input_folder = r"./../../../modules/tools/camera_calibration/Z0_Data/samples/image"
-    output_folder = input_folder + "_extracted"
+    input_folder = GLOBAL_CONFIG["simple_path"] + r"/samples_common/image"
+    output_folder = input_folder + "_converted"
 
     # debug
     # for frame in glob.glob(input_folder + "/*.jfif", recursive=True):
